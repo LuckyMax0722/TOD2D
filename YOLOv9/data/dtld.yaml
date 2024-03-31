@@ -1,0 +1,43 @@
+path: /home/jiachen/CARLA/dataset_yolo/dtld # dataset root dir
+train: images/train
+val: images/val
+test:
+
+# Classes
+names:
+  0: traffic light
+  1: circle.off
+  2: circle.red
+  3: circle.yellow
+  4: circle.red_yellow
+  5: circle.green
+  6: arrow_left.off
+  7: arrow_left.red
+  8: arrow_left.yellow
+  9: arrow_left.red_yellow
+  10: arrow_left.green
+  11: arrow_right.off
+  12: arrow_right.red
+  13: arrow_right.yellow
+  14: arrow_right.red_yellow
+  15: arrow_right.green
+  16: arrow_straight.off
+  17: arrow_straight.red
+  18: arrow_straight.yellow
+  19: arrow_straight.red_yellow
+  20: arrow_straight.green
+  21: tram.off
+  22: tram.red
+  23: tram.yellow
+  24: tram.red_yellow
+  25: tram.green
+  26: pedestrian.off
+  27: pedestrian.red
+  28: pedestrian.yellow
+  29: pedestrian.red_yellow
+  30: pedestrian.green
+  31: bicycle.off
+  32: bicycle.red
+  33: bicycle.yellow
+  34: bicycle.red_yellow
+  35: bicycle.green
