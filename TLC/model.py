@@ -5,6 +5,7 @@ import torchvision.models as models
 
 from torch.optim.lr_scheduler import StepLR
 
+
 # 初始化 Lightning 模型
 class EFFB3Model(pl.LightningModule):
     def __init__(self, freeze_layers=False):
@@ -28,7 +29,7 @@ class EFFB3Model(pl.LightningModule):
             nn.ReLU(),
             nn.Linear(512, 128),
             nn.ReLU(),
-            nn.Linear(128, 29)
+            nn.Linear(128, 32)
         )
 
     def forward(self, x):

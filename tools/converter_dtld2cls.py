@@ -68,7 +68,7 @@ def get_bbox_image(img, img_path, object, object_idx):
 
         # 保存JPG图片
         img_name = os.path.splitext(os.path.basename(img_path))[0]
-        target_path = os.path.join(CONF.dataset_classifier.images, img_name + '_' + str(object_idx) + '.jpg')
+        target_path = os.path.join(CONF.dataset_tlc_classifier.images, img_name + '_' + str(object_idx) + '.jpg')
         cv2.imwrite(target_path, im)
 
         # visualization
@@ -114,13 +114,37 @@ def crete_datasets(img):
         if attributes['reflection'] == 'reflected':
             continue
         else:
-            # 将非正向摄像头以及unknown仅作为摄像头类
-            if attributes['direction'] != 'front' or attributes['state'] == 'unknown' or attributes[
-                'pictogram'] == 'unknown' or attributes['state'] == 'off':
-
+            # 将非正向摄像头作为侧向摄像头
+            if attributes['direction'] == 'back':
                 state, target_path = get_bbox_image(image, image_path, object, idx)
                 if state:
                     obj_cat_list.append(0)  # class: 0
+                    img_path_list.append(target_path)
+                else:
+                    continue
+
+            elif attributes['direction'] == 'left':
+                state, target_path = get_bbox_image(image, image_path, object, idx)
+                if state:
+                    obj_cat_list.append(1)  # class: 1
+                    img_path_list.append(target_path)
+                else:
+                    continue
+
+            elif attributes['direction'] == 'right':
+                state, target_path = get_bbox_image(image, image_path, object, idx)
+                if state:
+                    obj_cat_list.append(2)  # class: 2
+                    img_path_list.append(target_path)
+                else:
+                    continue
+
+            # 以及unknown仅作为摄像头类
+            elif attributes['state'] == 'unknown' or attributes['pictogram'] == 'unknown' or attributes['state'] == 'off':
+
+                state, target_path = get_bbox_image(image, image_path, object, idx)
+                if state:
+                    obj_cat_list.append(3)  # class: 3
                     img_path_list.append(target_path)
                 else:
                     continue
@@ -129,7 +153,7 @@ def crete_datasets(img):
             elif attributes['direction'] == 'front':
                 # 圆形 红/黄/红黄/绿
                 if attributes['pictogram'] == 'circle':
-                    cls_base = 1
+                    cls_base = 4
 
                     state, target_path = get_bbox_image(image, image_path, object, idx)
                     if state:
@@ -140,7 +164,7 @@ def crete_datasets(img):
 
                 # 左转 红/黄/红黄/绿
                 elif attributes['pictogram'] == 'arrow_left':
-                    cls_base = 5
+                    cls_base = 8
 
                     state, target_path = get_bbox_image(image, image_path, object, idx)
                     if state:
@@ -151,7 +175,7 @@ def crete_datasets(img):
 
                 # 右转 红/黄/红黄/绿
                 elif attributes['pictogram'] == 'arrow_right':
-                    cls_base = 9
+                    cls_base = 12
 
                     state, target_path = get_bbox_image(image, image_path, object, idx)
                     if state:
@@ -162,7 +186,7 @@ def crete_datasets(img):
 
                 # 直行 红/黄/红黄/绿
                 elif attributes['pictogram'] == 'arrow_straight':
-                    cls_base = 13
+                    cls_base = 16
 
                     state, target_path = get_bbox_image(image, image_path, object, idx)
                     if state:
@@ -173,7 +197,7 @@ def crete_datasets(img):
 
                 # 电车 红/黄/红黄/绿
                 elif attributes['pictogram'] == 'tram':
-                    cls_base = 17
+                    cls_base = 20
 
                     state, target_path = get_bbox_image(image, image_path, object, idx)
                     if state:
@@ -184,7 +208,7 @@ def crete_datasets(img):
 
                 # 行人 红/黄/红黄/绿
                 elif attributes['pictogram'] == 'pedestrian':
-                    cls_base = 21
+                    cls_base = 24
 
                     state, target_path = get_bbox_image(image, image_path, object, idx)
                     if state:
@@ -195,7 +219,7 @@ def crete_datasets(img):
 
                 # 自行车 红/黄/红黄/绿
                 elif attributes['pictogram'] == 'bicycle':
-                    cls_base = 25
+                    cls_base = 28
 
                     state, target_path = get_bbox_image(image, image_path, object, idx)
                     if state:
@@ -210,7 +234,7 @@ def crete_datasets(img):
                 pass
 
     # txt文件的创建
-    txt_output_path = os.path.join(CONF.dataset_classifier.labels, 'dtld_cls' + '.txt')
+    txt_output_path = os.path.join(CONF.dataset_tlc_classifier.labels, 'dtld_cls' + '.txt')
 
     # 打开一个 TXT 文件进行追加写入
     with open(txt_output_path, 'a') as f:
@@ -225,8 +249,8 @@ def main(label_file, data_base_dir):
     database = get_database(label_file, data_base_dir)
 
     # 创建dataset路径并确保目录存在
-    os.makedirs(CONF.dataset_classifier.images, exist_ok=True)
-    os.makedirs(CONF.dataset_classifier.labels, exist_ok=True)
+    os.makedirs(CONF.dataset_tlc_classifier.images, exist_ok=True)
+    os.makedirs(CONF.dataset_tlc_classifier.labels, exist_ok=True)
 
     # 获取处理器核心数量
     num_cores = multiprocessing.cpu_count()

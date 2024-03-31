@@ -80,40 +80,36 @@ names:
   77: teddy bear
   78: hair drier
   79: toothbrush
-  80: traffic light
-  81: circle.off
-  82: circle.red
-  83: circle.yellow
-  84: circle.red_yellow
-  85: circle.green
-  86: arrow_left.off
-  87: arrow_left.red
-  88: arrow_left.yellow
-  89: arrow_left.red_yellow
-  90: arrow_left.green
-  91: arrow_right.off
+  80: traffic light back
+  81: traffic light left
+  82: traffic light right
+  83: traffic light
+  84: circle.red
+  85: circle.yellow
+  86: circle.red_yellow
+  87: circle.green
+  88: arrow_left.red
+  89: arrow_left.yellow
+  90: arrow_left.red_yellow
+  91: arrow_left.green
   92: arrow_right.red
   93: arrow_right.yellow
   94: arrow_right.red_yellow
   95: arrow_right.green
-  96: arrow_straight.off
-  97: arrow_straight.red
-  98: arrow_straight.yellow
-  99: arrow_straight.red_yellow
-  100: arrow_straight.green
-  101: tram.off
-  102: tram.red
-  103: tram.yellow
-  104: tram.red_yellow
-  105: tram.green
-  106: pedestrian.off
-  107: pedestrian.red
-  108: pedestrian.yellow
-  109: pedestrian.red_yellow
-  110: pedestrian.green
-  111: bicycle.off
-  112: bicycle.red
-  113: bicycle.yellow
-  114: bicycle.red_yellow
-  115: bicycle.green
+  96: arrow_straight.red
+  97: arrow_straight.yellow
+  98: arrow_straight.red_yellow
+  99: arrow_straight.green
+  100: tram.red
+  101: tram.yellow
+  102: tram.red_yellow
+  103: tram.green
+  104: pedestrian.red
+  105: pedestrian.yellow
+  106: pedestrian.red_yellow
+  107: pedestrian.green
+  108: bicycle.red
+  109: bicycle.yellow
+  110: bicycle.red_yellow
+  111: bicycle.green
 
