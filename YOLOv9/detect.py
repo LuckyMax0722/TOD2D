@@ -27,7 +27,7 @@ sys.path.append(root_dir)
 from lib.config import CONF
 from TLC.model import EFFB3Model
 
-# python /media/jiachen/LJC-2/TOD2D/YOLOv9/detect.py --data /media/jiachen/LJC-2/TOD2D/YOLOv9/data/coco_dtld.yaml --source /media/jiachen/LJC-2/TOD2D/dataset_yolo/dtld/images/val/DE_BBBR667_2015-04-17_11-11-58-638656_k0.jpg --img 640 --device 0 --weights /media/jiachen/LJC-2/TOD2D/YOLOv9/weights/yolov9-e-converted.pt
+# python /home/jiachen/TOD2D/YOLOv9/detect.py --data /home/jiachen/TOD2D/YOLOv9/data/coco_dtld.yaml --source /home/jiachen/TOD2D/demo/test2.png --img 640 --device 0 --weights /home/jiachen/TOD2D/YOLOv9/weights/yolov9-e-converted.pt
 
 @smart_inference_mode()
 def run(

@@ -31,8 +31,19 @@ pip install pytorch-lightning==2.1.4
 
 4. Install the dependencies.
 ```
+pip install opencv-python
 pip install easydict
+pip install matplotlib
+pip install pandas
+pip install ipython
+pip install psutil
+pip install seaborn
+```
+
+5. Install the visualization
+```angular2html
 pip install tensorboard
+pip install protobuf==3.19.6
 ```
 
 ## Data Preparation

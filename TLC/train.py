@@ -23,7 +23,7 @@ checkpoint_callback = pl.callbacks.ModelCheckpoint(
 # 初始化 EarlyStopping 回调
 early_stopping_callback = pl.callbacks.EarlyStopping(
     monitor='val_loss',  # 监视验证集损失
-    patience=10,         # 忍耐次数，即多少个epoch没有改善时停止训练
+    patience=5,         # 忍耐次数，即多少个epoch没有改善时停止训练
     mode='min'           # 通过最小化验证集损失来判断是否停止
 )
 
@@ -39,5 +39,5 @@ trainer = pl.Trainer(
 # 训练模型
 trainer.fit(model, data_module)
 
-# tensorboard --logdir=/home/jiachen/CARLA/TLC/lightning_logs
+# tensorboard --logdir=/home/jiachen/TOD2D/TLC/lightning_logs
 

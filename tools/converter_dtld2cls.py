@@ -266,4 +266,4 @@ def main(label_file, data_base_dir):
 
 
 if __name__ == "__main__":
-    main(label_file=CONF.PATH.LABELS, data_base_dir=CONF.PATH.DATA)
+    main(label_file=CONF.PATH.LABELS_DTLD, data_base_dir=CONF.PATH.DATA_DLTD)

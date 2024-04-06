@@ -80,7 +80,7 @@ if __name__ == '__main__':
     label_file_paths = []
 
     # 遍历文件夹
-    for root, dirs, files in os.walk(CONF.dataset.images_train):
+    for root, dirs, files in os.walk(CONF.dataset_yolo.images_train):
         # 遍历当前文件夹下的文件
         for file_name in sorted(files):
             # 构建文件的完整路径
@@ -88,7 +88,7 @@ if __name__ == '__main__':
             # 将文件路径添加到列表中
             image_file_paths.append(file_path)
 
-    for root, dirs, files in os.walk(CONF.dataset.labels_train):
+    for root, dirs, files in os.walk(CONF.dataset_yolo.labels_train):
         # 遍历当前文件夹下的文件
         for file_name in sorted(files):
             # 构建文件的完整路径
