@@ -9,19 +9,14 @@ Example usage:
 import sys
 import yaml
 import os
-
 import cv2
+import multiprocessing
+from tqdm import tqdm
 
 from lib.config import CONF
 
-import multiprocessing
-from multiprocessing import Manager
 
-from tqdm import tqdm
-from functools import partial
-
-
-def visualization_image(image_path, obj_cat_list, obj_bbox_list):
+def visualization_image(image_path, obj_bbox_list):
     # 读取PNG图片
     image = cv2.imread(image_path)
 
@@ -29,12 +24,14 @@ def visualization_image(image_path, obj_cat_list, obj_bbox_list):
     color = (255, 0, 0)
 
     # 绘制边界框和标签
-    for label, bbox in zip(obj_cat_list, obj_bbox_list):
+    for bbox in obj_bbox_list:
         x_min, y_min, x_max, y_max = bbox
         # 绘制矩形
         cv2.rectangle(image, (x_min, y_min), (x_max, y_max), color, 2)
+        '''
         # 添加标签
         cv2.putText(image, label, (x_min, y_min - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+        '''
 
     # 显示图片
     cv2.imshow('Test Image', image)
@@ -62,7 +59,7 @@ def get_resize_object_bbox(bbox):
     return [x_min, y_min, x_max, y_max]
 
 
-def get_bbox_image(bbox, image_path):
+def get_bbox_image(object_idx, bbox, image_path):
     resize_bbox = get_resize_object_bbox(bbox)
 
     # Read image
@@ -83,16 +80,44 @@ def get_bbox_image(bbox, image_path):
         '''
 
         # 保存JPG图片
-        '''
-        img_name = os.path.splitext(os.path.basename(img_path))[0]
+        img_name = os.path.splitext(os.path.basename(image_path))[0]
         target_path = os.path.join(CONF.dataset_tlc_classifier.images, img_name + '_' + str(object_idx) + '.jpg')
         cv2.imwrite(target_path, im)
-        '''
 
-        return True, ''
+        return True, target_path
 
 
-def crete_datasets(image, label_counts):
+def get_bbox_label(label):
+    # return colour, shape
+    if label == 'Red':
+        return 0, 0
+    elif label == 'RedLeft':
+        return 0, 1
+    elif label == 'RedRight':
+        return 0, 2
+    elif label == 'RedStraight':
+        return 0, 3
+    elif label == 'RedStraightLeft':
+        return 0, 4
+    elif label == 'Yellow':
+        return 1, 4
+    elif label == 'Green':
+        return 2, 0
+    elif label == 'GreenLeft':
+        return 2, 1
+    elif label == 'GreenRight':
+        return 2, 2
+    elif label == 'GreenStraight':
+        return 2, 3
+    elif label == 'GreenStraightRight':
+        return 2, 4
+    elif label == 'GreenStraightLeft':
+        return 2, 4
+    elif label == 'off':
+        return 3, 4
+
+
+def crete_datasets(image):
     boxes = image['boxes']
     image_path = image['path']
     image_path = image_path.split("./")[1]
@@ -100,52 +125,110 @@ def crete_datasets(image, label_counts):
 
     # 获取标签
     img_path_list = []
-    obj_cat_list = []
+    obj_col_list = []
+    obj_cls_list = []
     obj_bbox_list = []
 
-    for box in boxes:
+    for object_idx, box in enumerate(boxes):
         bbox = [int(box['x_min']), int(box['y_min']), int(box['x_max']), int(box['y_max'])]
 
-        state, target_path = get_bbox_image(bbox, image_path)
+        # Add bbox for Vis
+        obj_bbox_list.append(bbox)
+
+        state, target_path = get_bbox_image(object_idx, bbox, image_path)
 
         if state:
-            label = box['label']
+            # Saved Jpg Path
+            img_path_list.append(target_path)
 
-            obj_cat_list.append(label)
-            if label in label_counts:
-                label_counts[label] += 1
-            else:
-                label_counts[label] = 1
+            # Save label
+            ## Colour and Class
+            label = box['label']
+            col, cls = get_bbox_label(label)
+            obj_col_list.append(col)
+            obj_cls_list.append(cls)
+
 
         else:
             continue
 
-        # obj_bbox_list.append(bbox)
-
-    # visualization_image(image_path, obj_cat_list, obj_bbox_list)
+    # visualization_image(image_path, obj_bbox_list)
     # Press 0 to kill the image window
 
+    # txt文件的创建
+    txt_output_path = CONF.dataset_tlc_classifier.labels_txt_path
 
-def main(image, label_counts):
+    # 打开一个 TXT 文件进行追加写入
+    with open(txt_output_path, 'a') as f:
+        # 遍历图片信息列表，并将每一行数据追加到文件末尾
+        for path, col, cls in zip(img_path_list, obj_col_list, obj_cls_list):
+            line = f"{path} {col} {cls}\n"
+            f.write(line)
+
+
+def main(image):
     boxes = image['boxes']
     if not boxes:
         return
     else:
-        crete_datasets(image, label_counts)
+        crete_datasets(image)
+
+
+def crete_datasets_test(image):
+    boxes = image['boxes']
+    image_path = image['path']
+    image_path = image_path.split('/')[-1]
+    image_path = os.path.join(CONF.PATH.DATA_BSLTD, 'rgb/test', image_path)
+
+    # 获取标签
+    img_path_list = []
+    obj_col_list = []
+    obj_cls_list = []
+    obj_bbox_list = []
+
+    for object_idx, box in enumerate(boxes):
+        bbox = [int(box['x_min']), int(box['y_min']), int(box['x_max']), int(box['y_max'])]
+
+        # Add bbox for Vis
+        obj_bbox_list.append(bbox)
+
+        state, target_path = get_bbox_image(object_idx, bbox, image_path)
+
+        if state:
+            # Saved Jpg Path
+            img_path_list.append(target_path)
+
+            # Save label
+            ## Colour and Class
+            label = box['label']
+            col, cls = get_bbox_label(label)
+            obj_col_list.append(col)
+            obj_cls_list.append(cls)
+
+        else:
+            continue
+
+    # visualization_image(image_path, obj_bbox_list)
+    # Press 0 to kill the image window
+
+def test(image):
+    boxes = image['boxes']
+    if not boxes:
+        return
+    else:
+        crete_datasets_test(image)
 
 
 if __name__ == '__main__':
-    yaml_path = os.path.join(CONF.PATH.DATA_BSLTD, 'train.yaml')
-    out_dir = os.path.join(CONF.PATH.DATASET_CLS, 'bsltd_cls')
+    '''
+    # Part 1 Images
+    train_yaml_path = os.path.join(CONF.PATH.DATA_BSLTD, 'train.yaml')
 
     # 创建dataset路径并确保目录存在
-    # os.makedirs(out_dir, exist_ok=True)
+    os.makedirs(CONF.dataset_tlc_classifier.images, exist_ok=True)
+    os.makedirs(CONF.dataset_tlc_classifier.labels, exist_ok=True)
 
-    images = yaml.full_load(open(yaml_path, 'rb').read())
-
-    # 创建共享的 label_counts 字典
-    manager = Manager()
-    label_counts = manager.dict()
+    images = yaml.full_load(open(train_yaml_path, 'rb').read())
 
     # 获取处理器核心数量
     num_cores = multiprocessing.cpu_count()
@@ -153,11 +236,26 @@ if __name__ == '__main__':
     # 使用多进程处理数据集中的每张图片
     with multiprocessing.Pool(processes=num_cores) as pool:
         # 使用 tqdm 创建进度条
-        with tqdm(total=len(images), desc='Processing Images') as pbar:
-            func = partial(main, label_counts=label_counts)
-            for _ in pool.imap_unordered(func, images):
+        with tqdm(total=len(images), desc='Processing Images Part 1') as pbar:
+            for _ in pool.imap_unordered(main, images):
                 pbar.update(1)
 
-    print("所有图片处理完成")
+    print("Finish Processing Images Part 1")
+    '''
+    # Part 2 Images
+    test_yaml_path = os.path.join(CONF.PATH.DATA_BSLTD, 'test.yaml')
 
-    print(label_counts)
+    images = yaml.full_load(open(test_yaml_path, 'rb').read())
+
+    # 获取处理器核心数量
+    num_cores = multiprocessing.cpu_count()
+
+    # 使用多进程处理数据集中的每张图片
+    with multiprocessing.Pool(processes=num_cores) as pool:
+        # 使用 tqdm 创建进度条
+        with tqdm(total=len(images), desc='Processing Images Part 2') as pbar:
+            for _ in pool.imap_unordered(test, images):
+                pbar.update(1)
+
+    print("Finish Processing Images Part 2")
+

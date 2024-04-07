@@ -78,7 +78,7 @@ CONF.PATH.BASE = '.../TOD2D'  # TODO: change this
 CONF.PATH.LABELS = os.path.join(CONF.PATH.DATA, 'DTLD_Labels_v2.0/v2.0/DTLD_all.json') # TODO: change this if use different data
 ```
 
-3. First you need to use a data converter to convert the DTLD into a Classifier format dataset. Please note that this step is **mandatory**.
+3. First you need to use a data converter to convert the DTLD into a Classifier format dataset.
 ```angular2html
 cd TOD2D
 python tools/converter_dtld2cls.py
@@ -94,3 +94,13 @@ dataset_cls
 │   ├── labels
 │       ├── dtld_cls.txt     
 ```
+
+5. We manually divided the labels into the categories shown in the table below:
+
+|        | Circle | Left | Right | Straight | Other |
+|:------:|:------:|:----:|:-----:|:--------:|:-----:|
+|  Red   |  0,0   | 0,1  |  0,2  |   0,3    |  0,4  |
+| Yellow |  1,0   | 1,1  |  1,2  |   1,3    |  1,4  |
+| Green  |  2,0   | 2,1  |  2,2  |   2,3    |  2,4  |
+|  Off   |        |      |       |          |  3,4  |
+

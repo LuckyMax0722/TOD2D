@@ -234,7 +234,7 @@ def crete_datasets(img):
                 pass
 
     # txt文件的创建
-    txt_output_path = os.path.join(CONF.dataset_tlc_classifier.labels, 'dtld_cls' + '.txt')
+    txt_output_path = CONF.dataset_tlc_classifier.labels_txt_path
 
     # 打开一个 TXT 文件进行追加写入
     with open(txt_output_path, 'a') as f:
