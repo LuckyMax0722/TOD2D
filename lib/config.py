@@ -8,19 +8,13 @@ CONF.PATH = EasyDict()
 CONF.PATH.BASE = '/home/jiachen/TOD2D'  # TODO: change this
 #CONF.PATH.DATA = os.path.join(CONF.PATH.BASE, 'data')
 
-# DLTD
-#CONF.PATH.DATA_DLTD = os.path.join(CONF.PATH.DATA, 'data_DTLD')
-#CONF.PATH.LABELS_DLTD = os.path.join(CONF.PATH.DATA_DLTD, 'DTLD_Labels_v2.0/v2.0/DTLD_all.json') # TODO: change this if use different data
-
-# BSLTD
-
 #Temp
 CONF.PATH.DATA = os.path.join('/media/jiachen/LJC-2/TOD2D', 'data')
-CONF.PATH.DATA_DLTD = os.path.join(CONF.PATH.DATA, 'data_DTLD')
-CONF.PATH.LABELS_DLTD = os.path.join(CONF.PATH.DATA_DLTD, 'DTLD_Labels_v2.0/v2.0/DTLD_all.json')
-
+# DTLD
+CONF.PATH.DATA_DTLD = os.path.join(CONF.PATH.DATA, 'data_DTLD')
+CONF.PATH.LABELS_DTLD = os.path.join(CONF.PATH.DATA_DTLD, 'DTLD_Labels_v2.0/v2.0/DTLD_all.json') # TODO: change this if use different data
+# BSLTD
 CONF.PATH.DATA_BSLTD = os.path.join(CONF.PATH.DATA, 'data_BSLTD')
-
 
 CONF.PATH.DATASET_YOLO = os.path.join(CONF.PATH.BASE, 'dataset_yolo')
 CONF.PATH.DATASET_CLS = os.path.join(CONF.PATH.BASE, 'dataset_cls')

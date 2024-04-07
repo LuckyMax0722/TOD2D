@@ -97,10 +97,20 @@ dataset_cls
 
 5. We manually divided the labels into the categories shown in the table below:
 
-|        | Circle | Left | Right | Straight | Other |
-|:------:|:------:|:----:|:-----:|:--------:|:-----:|
-|  Red   |  0,0   | 0,1  |  0,2  |   0,3    |  0,4  |
-| Yellow |  1,0   | 1,1  |  1,2  |   1,3    |  1,4  |
-| Green  |  2,0   | 2,1  |  2,2  |   2,3    |  2,4  |
-|  Off   |        |      |       |          |  3,4  |
+| Traffic light color | Class number |
+|:-------------------:|:------------:|
+|         Red         |      0       |
+|       Yellow        |      1       |
+|        Green        |      2       |
+|         Off         |      3       |
+
+| Traffic light type | Class number  |
+|:------------------:|:-------------:|
+|       Circle       |       0       |
+|        Left        |       1       |
+|       Right        |       2       |
+|      Straight      |       3       |
+|       Other        |       4       |
+
+In this work, the label of each image consists of **color** and **type**. Based on the above table, some examples can be given, e.g. ``RedStraight = 0,3``, ``Yellow = 1,4`` and ``Greenbicycle = 2,4``
 

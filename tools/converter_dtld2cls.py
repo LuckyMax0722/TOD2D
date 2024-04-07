@@ -81,18 +81,16 @@ def get_bbox_image(img, img_path, object, object_idx):
         return True, target_path
 
 
-def assign_cls(object, obj_cat_list, cls_base):
+def assign_cls(object):
     attributes = object.attributes
     if attributes['state'] == 'red':
-        obj_cat_list.append(cls_base)  # class: cls_base
+        return 0
     elif attributes['state'] == 'yellow':
-        obj_cat_list.append(cls_base + 1)  # class: cls_base + 1
-    elif attributes['state'] == 'red_yellow':
-        obj_cat_list.append(cls_base + 2)  # class: cls_base + 2
+        return 1
     elif attributes['state'] == 'green':
-        obj_cat_list.append(cls_base + 3)  # class: cls_base + 3
+        return 2
     else:
-        pass
+        raise ValueError('Unknown state')
 
 
 def crete_datasets(img):
@@ -104,7 +102,9 @@ def crete_datasets(img):
 
     # 获取标签
     img_path_list = []
-    obj_cat_list = []
+    obj_col_list = []
+    obj_cls_list = []
+
 
     for idx, object in enumerate(objects):
         # 获取每个物体的特征
@@ -113,123 +113,68 @@ def crete_datasets(img):
         # 不考虑反光
         if attributes['reflection'] == 'reflected':
             continue
+        elif attributes['state'] == 'red_yellow':
+            pass
         else:
-            # 将非正向摄像头作为侧向摄像头
-            if attributes['direction'] == 'back':
+            # 将非正向摄像头作为off / other
+            if attributes['direction'] != 'front' or attributes['state'] == 'unknown' or attributes['state'] == 'off':
                 state, target_path = get_bbox_image(image, image_path, object, idx)
                 if state:
-                    obj_cat_list.append(0)  # class: 0
+                    obj_col_list.append(3)  # off
+                    obj_cls_list.append(4)  # other
                     img_path_list.append(target_path)
                 else:
                     continue
 
-            elif attributes['direction'] == 'left':
+            elif attributes['pictogram'] == 'circle':
+                # 圆形 红/黄/绿
                 state, target_path = get_bbox_image(image, image_path, object, idx)
                 if state:
-                    obj_cat_list.append(1)  # class: 1
+                    obj_col_list.append(assign_cls(object))
+                    obj_cls_list.append(0)  # Circle
                     img_path_list.append(target_path)
                 else:
                     continue
 
-            elif attributes['direction'] == 'right':
+            elif attributes['pictogram'] == 'arrow_left':
+                # 左 红/黄/绿
                 state, target_path = get_bbox_image(image, image_path, object, idx)
                 if state:
-                    obj_cat_list.append(2)  # class: 2
+                    obj_col_list.append(assign_cls(object))
+                    obj_cls_list.append(1)  # Left
                     img_path_list.append(target_path)
                 else:
                     continue
 
-            # 以及unknown仅作为摄像头类
-            elif attributes['state'] == 'unknown' or attributes['pictogram'] == 'unknown' or attributes['state'] == 'off':
-
+            elif attributes['pictogram'] == 'arrow_right':
+                # 右 红/黄/绿
                 state, target_path = get_bbox_image(image, image_path, object, idx)
                 if state:
-                    obj_cat_list.append(3)  # class: 3
+                    obj_col_list.append(assign_cls(object))
+                    obj_cls_list.append(2)  # Right
                     img_path_list.append(target_path)
                 else:
                     continue
 
-            # 基于红绿灯类型和颜色细分正向摄像头类
-            elif attributes['direction'] == 'front':
-                # 圆形 红/黄/红黄/绿
-                if attributes['pictogram'] == 'circle':
-                    cls_base = 4
-
-                    state, target_path = get_bbox_image(image, image_path, object, idx)
-                    if state:
-                        assign_cls(object, obj_cat_list, cls_base)
-                        img_path_list.append(target_path)
-                    else:
-                        continue
-
-                # 左转 红/黄/红黄/绿
-                elif attributes['pictogram'] == 'arrow_left':
-                    cls_base = 8
-
-                    state, target_path = get_bbox_image(image, image_path, object, idx)
-                    if state:
-                        assign_cls(object, obj_cat_list, cls_base)
-                        img_path_list.append(target_path)
-                    else:
-                        continue
-
-                # 右转 红/黄/红黄/绿
-                elif attributes['pictogram'] == 'arrow_right':
-                    cls_base = 12
-
-                    state, target_path = get_bbox_image(image, image_path, object, idx)
-                    if state:
-                        assign_cls(object, obj_cat_list, cls_base)
-                        img_path_list.append(target_path)
-                    else:
-                        continue
-
-                # 直行 红/黄/红黄/绿
-                elif attributes['pictogram'] == 'arrow_straight':
-                    cls_base = 16
-
-                    state, target_path = get_bbox_image(image, image_path, object, idx)
-                    if state:
-                        assign_cls(object, obj_cat_list, cls_base)
-                        img_path_list.append(target_path)
-                    else:
-                        continue
-
-                # 电车 红/黄/红黄/绿
-                elif attributes['pictogram'] == 'tram':
-                    cls_base = 20
-
-                    state, target_path = get_bbox_image(image, image_path, object, idx)
-                    if state:
-                        assign_cls(object, obj_cat_list, cls_base)
-                        img_path_list.append(target_path)
-                    else:
-                        continue
-
-                # 行人 红/黄/红黄/绿
-                elif attributes['pictogram'] == 'pedestrian':
-                    cls_base = 24
-
-                    state, target_path = get_bbox_image(image, image_path, object, idx)
-                    if state:
-                        assign_cls(object, obj_cat_list, cls_base)
-                        img_path_list.append(target_path)
-                    else:
-                        continue
-
-                # 自行车 红/黄/红黄/绿
-                elif attributes['pictogram'] == 'bicycle':
-                    cls_base = 28
-
-                    state, target_path = get_bbox_image(image, image_path, object, idx)
-                    if state:
-                        assign_cls(object, obj_cat_list, cls_base)
-                        img_path_list.append(target_path)
-                    else:
-                        continue
-
+            elif attributes['pictogram'] == 'arrow_straight':
+                # 直行 红/黄/绿
+                state, target_path = get_bbox_image(image, image_path, object, idx)
+                if state:
+                    obj_col_list.append(assign_cls(object))
+                    obj_cls_list.append(3)  # Straight
+                    img_path_list.append(target_path)
                 else:
-                    pass
+                    continue
+
+            elif attributes['pictogram'] == 'unknown' or attributes['pictogram'] == 'tram' or attributes['pictogram'] == 'pedestrian' or attributes['pictogram'] == 'bicycle':
+                # 其他 红/黄/绿
+                state, target_path = get_bbox_image(image, image_path, object, idx)
+                if state:
+                    obj_col_list.append(assign_cls(object))
+                    obj_cls_list.append(4)  # Other
+                    img_path_list.append(target_path)
+                else:
+                    continue
             else:
                 pass
 
@@ -239,8 +184,8 @@ def crete_datasets(img):
     # 打开一个 TXT 文件进行追加写入
     with open(txt_output_path, 'a') as f:
         # 遍历图片信息列表，并将每一行数据追加到文件末尾
-        for path, cls in zip(img_path_list, obj_cat_list):
-            line = f"{path} {cls}\n"
+        for path, col, cls in zip(img_path_list, obj_col_list, obj_cls_list):
+            line = f"{path} {col} {cls}\n"
             f.write(line)
 
 
@@ -258,12 +203,12 @@ def main(label_file, data_base_dir):
     # 使用多进程处理数据集中的每张图片
     with multiprocessing.Pool(processes=num_cores) as pool:
         # 使用 tqdm 创建进度条
-        with tqdm(total=len(database.images), desc='Processing Images') as pbar:
+        with tqdm(total=len(database.images), desc='Processing DTLD Images') as pbar:
             for _ in pool.imap_unordered(crete_datasets, database.images):
                 pbar.update(1)
 
-    print("所有图片处理完成")
+    print("Finish Processing DTLD Images")
 
 
 if __name__ == "__main__":
-    main(label_file=CONF.PATH.LABELS_DTLD, data_base_dir=CONF.PATH.DATA_DLTD)
+    main(label_file=CONF.PATH.LABELS_DTLD, data_base_dir=CONF.PATH.DATA_DTLD)

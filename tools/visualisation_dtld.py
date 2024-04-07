@@ -74,8 +74,8 @@ def main(label_file, data_base_dir, mode):
 
 
 if __name__ == "__main__":
-    label_file = CONF.PATH.LABELS_DLTD
-    data_base_dir = CONF.PATH.DATA_DLTD
+    label_file = CONF.PATH.LABELS_DTLD
+    data_base_dir = CONF.PATH.DATA_DTLD
 
     # 1: use cv2 from image_path + labels
     # 2: use function from driveu

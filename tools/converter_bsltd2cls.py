@@ -11,6 +11,7 @@ import yaml
 import os
 import cv2
 import multiprocessing
+from functools import partial
 from tqdm import tqdm
 
 from lib.config import CONF
@@ -88,7 +89,7 @@ def get_bbox_image(object_idx, bbox, image_path):
 
 
 def get_bbox_label(label):
-    # return colour, shape
+    # return color, shape
     if label == 'Red':
         return 0, 0
     elif label == 'RedLeft':
@@ -117,11 +118,17 @@ def get_bbox_label(label):
         return 3, 4
 
 
-def crete_datasets(image):
+def crete_datasets(image, mode):
     boxes = image['boxes']
     image_path = image['path']
-    image_path = image_path.split("./")[1]
-    image_path = os.path.join(CONF.PATH.DATA_BSLTD, image_path)
+    if mode == 'train':
+        image_path = image_path.split("./")[1]
+        image_path = os.path.join(CONF.PATH.DATA_BSLTD, image_path)
+    elif mode == 'test':
+        image_path = image_path.split('/')[-1]
+        image_path = os.path.join(CONF.PATH.DATA_BSLTD, 'rgb/test', image_path)
+    else:
+        raise ValueError("Mode is wrong")
 
     # 获取标签
     img_path_list = []
@@ -166,61 +173,15 @@ def crete_datasets(image):
             f.write(line)
 
 
-def main(image):
+def main(image, mode):
     boxes = image['boxes']
     if not boxes:
         return
     else:
-        crete_datasets(image)
-
-
-def crete_datasets_test(image):
-    boxes = image['boxes']
-    image_path = image['path']
-    image_path = image_path.split('/')[-1]
-    image_path = os.path.join(CONF.PATH.DATA_BSLTD, 'rgb/test', image_path)
-
-    # 获取标签
-    img_path_list = []
-    obj_col_list = []
-    obj_cls_list = []
-    obj_bbox_list = []
-
-    for object_idx, box in enumerate(boxes):
-        bbox = [int(box['x_min']), int(box['y_min']), int(box['x_max']), int(box['y_max'])]
-
-        # Add bbox for Vis
-        obj_bbox_list.append(bbox)
-
-        state, target_path = get_bbox_image(object_idx, bbox, image_path)
-
-        if state:
-            # Saved Jpg Path
-            img_path_list.append(target_path)
-
-            # Save label
-            ## Colour and Class
-            label = box['label']
-            col, cls = get_bbox_label(label)
-            obj_col_list.append(col)
-            obj_cls_list.append(cls)
-
-        else:
-            continue
-
-    # visualization_image(image_path, obj_bbox_list)
-    # Press 0 to kill the image window
-
-def test(image):
-    boxes = image['boxes']
-    if not boxes:
-        return
-    else:
-        crete_datasets_test(image)
+        crete_datasets(image, mode)
 
 
 if __name__ == '__main__':
-    '''
     # Part 1 Images
     train_yaml_path = os.path.join(CONF.PATH.DATA_BSLTD, 'train.yaml')
 
@@ -236,12 +197,13 @@ if __name__ == '__main__':
     # 使用多进程处理数据集中的每张图片
     with multiprocessing.Pool(processes=num_cores) as pool:
         # 使用 tqdm 创建进度条
-        with tqdm(total=len(images), desc='Processing Images Part 1') as pbar:
-            for _ in pool.imap_unordered(main, images):
+        with tqdm(total=len(images), desc='Processing BSLTD Images Part 1') as pbar:
+            func = partial(main, mode='train')
+            for _ in pool.imap_unordered(func, images):
                 pbar.update(1)
 
-    print("Finish Processing Images Part 1")
-    '''
+    print("Finish Processing BSLTD Images Part 1")
+
     # Part 2 Images
     test_yaml_path = os.path.join(CONF.PATH.DATA_BSLTD, 'test.yaml')
 
@@ -253,9 +215,10 @@ if __name__ == '__main__':
     # 使用多进程处理数据集中的每张图片
     with multiprocessing.Pool(processes=num_cores) as pool:
         # 使用 tqdm 创建进度条
-        with tqdm(total=len(images), desc='Processing Images Part 2') as pbar:
-            for _ in pool.imap_unordered(test, images):
+        with tqdm(total=len(images), desc='Processing BSLTD Images Part 2') as pbar:
+            func = partial(main, mode='test')
+            for _ in pool.imap_unordered(func, images):
                 pbar.update(1)
 
-    print("Finish Processing Images Part 2")
+    print("Finish Processing BSLTD Images Part 2")
 
