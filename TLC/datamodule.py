@@ -33,3 +33,6 @@ class TrafficLightModule(pl.LightningDataModule):
         return DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=16, pin_memory=True)
 
 
+if __name__ == '__main__':
+    data_module = TrafficLightModule(txt_file=CONF.dataset_tlc_classifier.labels_txt_path,
+                                     batch_size=CONF.datamodule_tlc_classifier.batch_size)

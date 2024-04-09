@@ -1,7 +1,6 @@
 import os.path
 
 import matplotlib.pyplot as plt
-import numpy as np
 from lib.config import CONF
 
 

@@ -9,7 +9,9 @@ from lib.config import CONF
 data_module = TrafficLightModule(txt_file=CONF.dataset_tlc_classifier.labels_txt_path, batch_size=CONF.datamodule_tlc_classifier.batch_size)
 
 # 初始化模型
-model = EFFB3Model(freeze_layers=CONF.model_tlc_classifier.freeze_layers)
+model = EFFB3Model(freeze_layers=CONF.model_tlc_classifier.freeze_layers,
+                   num_class_color=CONF.model_tlc_classifier.num_class_color,
+                   num_class_direction=CONF.model_tlc_classifier.num_class_direction)
 
 # 初始化 ModelCheckpoint 回调
 checkpoint_callback = pl.callbacks.ModelCheckpoint(
@@ -31,7 +33,7 @@ early_stopping_callback = pl.callbacks.EarlyStopping(
 trainer = pl.Trainer(
     accelerator='gpu',
     devices=1,
-    max_epochs=300,
+    max_epochs=500,
     log_every_n_steps=10,
     callbacks=[checkpoint_callback, early_stopping_callback]  # 添加 ModelCheckpoint early_stopping_callback 回调
 )

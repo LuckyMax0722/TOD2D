@@ -40,10 +40,12 @@ CONF.dataset_tlc_classifier.labels_txt_path = os.path.join(CONF.dataset_tlc_clas
 # Datamodule_Tlc_Classifier
 CONF.datamodule_tlc_classifier = EasyDict()
 CONF.datamodule_tlc_classifier.split_ratio = 0.9
-CONF.datamodule_tlc_classifier.batch_size = 25
+CONF.datamodule_tlc_classifier.batch_size = 30
 
 # Model_Tlc_Classifier
 CONF.model_tlc_classifier = EasyDict()
+CONF.model_tlc_classifier.num_class_color = 4
+CONF.model_tlc_classifier.num_class_direction = 5
 CONF.model_tlc_classifier.freeze_layers = False
 CONF.model_tlc_classifier.best_model = os.path.join(CONF.PATH.BASE, 'TLC/saved_models/best_model.ckpt')
 
